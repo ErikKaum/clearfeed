@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import detectEthereumProvider from '@metamask/detect-provider'
 import { CONTRACT_ADDRESS } from "../utils/address";
 import abi from "../utils/ClearFeed.json"
 
@@ -11,38 +12,67 @@ import toast, { Toaster } from 'react-hot-toast';
 export default function Home() {
   
   const handleClick = async() => {
-    try {
-      const { ethereum } = window
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        
-        let accounts 
-        try {
-          accounts = await provider.send("eth_requestAccounts", []);
-        } catch(error) {
-          toast("Can't continue without connecting wallet", {
-            icon: '🤷',
-          });
-          
-        }
+    const ethereum = await detectEthereumProvider({mustBeMetaMask : true})
 
-        if (accounts) {
-          const signer = provider.getSigner();
-          const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
-          try {
-            await contract.safeMint('zero','one','two') 
-          }
-          catch(error) {
-            console.log(error)
-          }
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum)
+      let accounts 
+      try {
+        accounts = await provider.send("eth_requestAccounts", []);
+      } catch(error) {
+        toast("Can't continue without connecting wallet", {
+          icon: '🤷',
+        });
+        
+      }
+
+      if (accounts) {
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
+        try {
+          await contract.safeMint('zero','one','two') 
+        }
+        catch(error) {
+          console.log(error)
         }
       }
-    } catch(error) {
-      toast('You need metamask to make this work!', {
-        icon: '🤷',
-      });
-      
+    } else {  
+      console.log('here')
     }
+
+
+    // try {
+    //   const { ethereum } = window
+    //   if (ethereum) {
+    //     const provider = new ethers.providers.Web3Provider(ethereum);
+        
+    //     let accounts 
+    //     try {
+    //       accounts = await provider.send("eth_requestAccounts", []);
+    //     } catch(error) {
+    //       toast("Can't continue without connecting wallet", {
+    //         icon: '🤷',
+    //       });
+          
+    //     }
+
+    //     if (accounts) {
+    //       const signer = provider.getSigner();
+    //       const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
+    //       try {
+    //         await contract.safeMint('zero','one','two') 
+    //       }
+    //       catch(error) {
+    //         console.log(error)
+    //       }
+    //     }
+    //   }
+    // } catch(error) {
+    //   toast('You need metamask to make this work!', {
+    //     icon: '🤷',
+    //   });
+      
+    // }
   }
 
   return (
