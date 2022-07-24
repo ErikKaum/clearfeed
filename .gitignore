@@ -30,3 +30,10 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+
+# hardhat stuff
+/cache
+/artifacts
+/scripts
+.env
