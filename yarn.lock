@@ -1774,7 +1774,7 @@
   "version" "0.7.5"
   dependencies:
     "buffer" "^5.5.0"
-    "class-is" "^1.1.0"
+    "className-is" "^1.1.0"
     "multibase" "~0.6.0"
     "multicodec" "^1.0.0"
     "multihashes" "~0.4.15"
@@ -1787,9 +1787,9 @@
     "inherits" "^2.0.1"
     "safe-buffer" "^5.0.1"
 
-"class-is@^1.1.0":
+"className-is@^1.1.0":
   "integrity" "sha512-rhjH9AG1fvabIDoGRVH587413LPjTZgmDF9fOFCbFJQV4yuocX1mHxxvXI4g3cGwbVY9wAYIoKlg1N79frJKQw=="
-  "resolved" "https://registry.npmjs.org/class-is/-/class-is-1.1.0.tgz"
+  "resolved" "https://registry.npmjs.org/className-is/-/className-is-1.1.0.tgz"
   "version" "1.1.0"
 
 "clean-stack@^2.0.0":
