@@ -18,7 +18,7 @@ import toast, { Toaster } from "react-hot-toast"
 
 const Signup = ({variables}) => {
 
-    const [step, setStep] = useState(4);
+    const [step, setStep] = useState(1);
     const [currentAccessToken, setAccessToken] = useState(null)
     const [currentProvider, setProvider] = useState(null)
     const router = useRouter()
