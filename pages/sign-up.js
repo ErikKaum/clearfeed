@@ -4,25 +4,40 @@ import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import Header from "../components/Header"
 
+import { ethers } from 'ethers';
+import detectEthereumProvider from '@metamask/detect-provider'
+import { CONTRACT_ADDRESS } from "../utils/address";
+import abi from "../utils/ClearFeed.json"
+
 import Btn2 from "../assets/Button2.svg"
 import { TwitterApi } from 'twitter-api-v2';
 
+import predictSentiment from "../models/sentiment"
+import { round, median } from "mathjs"
+import toast, { Toaster } from "react-hot-toast"
+
 const Signup = ({variables}) => {
 
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(4);
     const [currentAccessToken, setAccessToken] = useState(null)
+    const [currentProvider, setProvider] = useState(null)
     const router = useRouter()
 
     const clientId = variables.clientId
     const clientSecret = variables.clientSecret
     const callbackURL = variables.callbackURL
 
-    console.log(callbackURL)
-
     const twitterClient = new TwitterApi({
       clientId: clientId,
       clientSecret: clientSecret,
     });
+
+    useEffect(() => {
+      const accessToken = localStorage.getItem('accessToken')
+      if (accessToken) {
+        setStep(2);
+      }
+    },[])
 
     useEffect(() => {
         const logging = async () => {
@@ -43,24 +58,74 @@ const Signup = ({variables}) => {
     },[router])
     
     const connectSoMe = async() => {
-        const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(callbackURL, { scope: ['tweet.read', 'users.read',] });
+        const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(callbackURL, { scope: ['like.read', 'tweet.read', 'users.read',] });
         localStorage.setItem('codeVerifier', codeVerifier)
         router.push(url)
     }
 
-    const connectWallet = () => {
-        console.log(currentAccessToken)
-        setStep(3)
+    const connectWallet = async () => {
+      const ethereum = await detectEthereumProvider({mustBeMetaMask : true})
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        let accounts 
+        try {
+          accounts = await provider.send("eth_requestAccounts", []);
+          setProvider(provider)
+          setStep(3)
+        } catch(error) {
+          toast("Can't continue without connecting wallet", {
+            icon: '🤷',
+          });
+        }
     }
+  }
 
-    const mint = () => {
-        const accessToken = localStorage.getItem('accessToken')
-        console.log(accessToken)
-        setStep(1)
+  const mint = async () => {
+    toast("Just one minute, please!", {
+      icon: '⏳',
+    });
+
+    const tweets = await getLikedTweets()
+    const sentiments = await predictSentiment(tweets)
+
+    const roundedSentiment = round(sentiments, 3)
+    // console.log(roundedSentiment)
+    const medianSentiment = median(roundedSentiment)
+    
+    // console.log(medianSentiment)
+
+    const signer = currentProvider.getSigner();
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
+    try {
+      await contract.safeMint('0', medianSentiment.toString(), '0')
+      contract.on('Minted', (to, tokenId) => {
+        toast("Success!", {
+          icon: '🎉',
+        });
+        setStep(4)
+      })
+      return () => {
+        contract.removeAllListeners();
+      }
     }
+    catch(error) {
+      console.log(error)
+    }
+  }
+
+  const getLikedTweets = async () => {
+    const accessToken = localStorage.getItem('accessToken')
+    const res = await fetch('api/get-tweets?' + new URLSearchParams({
+      accessToken: accessToken,
+    }))
+    const data = await res.json()
+    const tweets = data.likedTweets._realData.data
+    return tweets
+  }
 
     return(
         <div>
+          <Toaster />
           <Head>
             <title>Clear Feed</title>
             <meta name="description" content="Sign up for Clear Feed"/>
@@ -113,13 +178,27 @@ const Signup = ({variables}) => {
                         3. Get your personalized feed!
                     </p>
                   </div>
+
+                  <div className="flex flex-col lg:flex-row lg:space-x-5 items-center">
+                    <button
+                      className="border-2 border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
+                      onClick={() => {router.push('/feed')}}
+                      disabled={step === 4 ? false : true}
+                      >
+                        Here!
+                    </button>
+                    <p className={`${step === 4 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
+                        4. Enjoy your feed!
+                    </p>
+                  </div>
+
                   
-                  <div className="flex flex-col justify-center items-center space-y-5">
+                  {/* <div className="flex flex-col justify-center items-center space-y-5">
                     <p className='text-xl font-bold'>or</p>
                     <button>
                         <Image src={Btn2} alt="button" height={110*0.5} width={412*0.5} />
                     </button>        
-                  </div>
+                  </div> */}
 
                 </div>
               </div>         
@@ -133,6 +212,7 @@ const Signup = ({variables}) => {
           </footer>
         </div>
     )
+  
 }
 
 export async function getStaticProps() {
