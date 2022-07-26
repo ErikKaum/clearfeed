@@ -41,4 +41,7 @@ module.exports = {
       accounts: [process.env.MUMBAI_ACCOUNT]
     }
   },
+  etherscan: {
+    apiKey: process.env.POLY_SCAN_KEY
+  },
 };
