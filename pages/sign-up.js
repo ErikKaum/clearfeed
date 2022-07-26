@@ -1,22 +1,57 @@
 import Head from "next/head"
 import Image from "next/image"
-import { useState } from "react"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
 import Header from "../components/Header"
 
 import Btn2 from "../assets/Button2.svg"
+import { TwitterApi } from 'twitter-api-v2';
 
 const Signup = () => {
     const [step, setStep] = useState(1);
+    const [currentAccessToken, setAccessToken] = useState(null)
+    const router = useRouter()
 
-    const connectSoMe = () => {
-        setStep(2)
+    const clientId = process.env.TWITTER_CLIENT_ID
+    const clientSecret = process.env.TWITTER_CLIENT_SECRET
+    const callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
+    const twitterClient = new TwitterApi({
+      clientId: clientId,
+      clientSecret: clientSecret,
+    });
+
+    useEffect(() => {
+        const logging = async () => {
+            if (router.query.state) {
+                const codeVerifier = localStorage.getItem('codeVerifier')
+                const res = await fetch('api/callback?' + new URLSearchParams({
+                    state: router.query.state,
+                    code: router.query.code,
+                    codeVerifier : codeVerifier
+                }))
+                const currentAccesToken = await res.json()
+                setAccessToken(currentAccesToken.accessToken)
+                localStorage.setItem('accessToken', currentAccesToken.accessToken)
+                setStep(2)
+            }    
+        }
+        logging()
+    },[router])
+    
+    const connectSoMe = async() => {
+        const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(callbackURL, { scope: ['tweet.read', 'users.read',] });
+        localStorage.setItem('codeVerifier', codeVerifier)
+        router.push(url)
     }
 
     const connectWallet = () => {
+        console.log(currentAccessToken)
         setStep(3)
     }
 
     const mint = () => {
+        const accessToken = localStorage.getItem('accessToken')
+        console.log(accessToken)
         setStep(1)
     }
 
@@ -83,8 +118,7 @@ const Signup = () => {
                   </div>
 
                 </div>
-              </div> 
-        
+              </div>         
         
             </div>
         
