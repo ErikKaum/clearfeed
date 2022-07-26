@@ -11,7 +11,11 @@ export default async function handler(req, res) {
       callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
     } else {
       callbackURL = process.env.TWITTER_CALLBACK_URL_PROD 
-    }  
+    }
+    
+    console.log(clientId)
+    console.log(clientSecret)
+    console.log(callbackURL)
     
     const twitterClient = new TwitterApi({
         clientId: clientId,
@@ -19,6 +23,10 @@ export default async function handler(req, res) {
     });
 
     const { state, code, codeVerifier } = req.query;
+
+    console.log(code)
+    console.log(codeVerifier)
+
     const { client: loggedClient, accessToken, refreshToken, } = await twitterClient.loginWithOAuth2({
         code,
         codeVerifier,
