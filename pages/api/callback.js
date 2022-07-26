@@ -3,7 +3,16 @@ import { TwitterApi } from 'twitter-api-v2';
 export default async function handler(req, res) {
     const clientId = process.env.TWITTER_CLIENT_ID
     const clientSecret = process.env.TWITTER_CLIENT_SECRET
-    const callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
+
+    let callbackURL
+    if (process.env.NODE_ENV === 'development') {
+      callbackURL = process.env.TWITTER_CALLBACK_URL_LOCAL
+    } else if (process.env.NODE_ENV === 'preview') {
+      callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
+    } else {
+      callbackURL = process.env.TWITTER_CALLBACK_URL_PROD 
+    }  
+    
     const twitterClient = new TwitterApi({
         clientId: clientId,
         clientSecret: clientSecret,

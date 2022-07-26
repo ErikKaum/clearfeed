@@ -7,14 +7,18 @@ import Header from "../components/Header"
 import Btn2 from "../assets/Button2.svg"
 import { TwitterApi } from 'twitter-api-v2';
 
-const Signup = () => {
+const Signup = ({variables}) => {
+
     const [step, setStep] = useState(1);
     const [currentAccessToken, setAccessToken] = useState(null)
     const router = useRouter()
 
-    const clientId = process.env.TWITTER_CLIENT_ID
-    const clientSecret = process.env.TWITTER_CLIENT_SECRET
-    const callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
+    const clientId = variables.clientId
+    const clientSecret = variables.clientSecret
+    const callbackURL = variables.callbackURL
+
+    console.log(callbackURL)
+
     const twitterClient = new TwitterApi({
       clientId: clientId,
       clientSecret: clientSecret,
@@ -131,4 +135,28 @@ const Signup = () => {
     )
 }
 
+export async function getStaticProps() {
+
+  let callbackURL
+  if (process.env.NODE_ENV === 'development') {
+    callbackURL = process.env.TWITTER_CALLBACK_URL_LOCAL
+  } else if (process.env.NODE_ENV === 'preview') {
+    callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
+  } else {
+    callbackURL = process.env.TWITTER_CALLBACK_URL_PROD 
+  }
+
+  const variables = ({
+    clientId: process.env.TWITTER_CLIENT_ID,
+    clientSecret : process.env.TWITTER_CLIENT_SECRET,
+    callbackURL : callbackURL
+  })
+  return {
+    props: {
+      variables
+    }
+  }
+}
+
 export default Signup
+
