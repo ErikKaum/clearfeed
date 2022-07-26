@@ -7,12 +7,13 @@ export default async function handler(req, res) {
     let callbackURL
     if (process.env.NODE_ENV === 'development') {
       callbackURL = process.env.TWITTER_CALLBACK_URL_LOCAL
-    } else if (process.env.NODE_ENV === 'preview') {
-      callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
     } else {
-      callbackURL = process.env.TWITTER_CALLBACK_URL_PROD 
-    }
-    
+      if (process.env.TWITTER_CALLBACK_URL_DEV) {
+        callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
+      } else {
+        callbackURL = process.env.TWITTER_CALLBACK_URL_PROD
+      }
+    }    
     console.log(clientId)
     console.log(clientSecret)
     console.log(callbackURL)
