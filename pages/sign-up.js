@@ -9,6 +9,7 @@ import detectEthereumProvider from '@metamask/detect-provider'
 import { CONTRACT_ADDRESS } from "../utils/address";
 import abi from "../utils/ClearFeed.json"
 
+import Spinner from "../assets/spinner"
 import Btn2 from "../assets/Button2.svg"
 import { TwitterApi } from 'twitter-api-v2';
 
@@ -21,6 +22,7 @@ const Signup = ({variables}) => {
     const [step, setStep] = useState(1);
     const [currentAccessToken, setAccessToken] = useState(null)
     const [currentProvider, setProvider] = useState(null)
+    const [loading, setLoading] = useState(false)
     const router = useRouter()
 
     const clientId = variables.clientId
@@ -81,7 +83,8 @@ const Signup = ({variables}) => {
   }
 
   const mint = async () => {
-    toast("Just one minute, please!", {
+    // setLoading(true)
+    toast("Just a moment, preparing", {
       icon: '⏳',
     });
 
@@ -97,19 +100,32 @@ const Signup = ({variables}) => {
     const signer = currentProvider.getSigner();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
     try {
-      await contract.safeMint('0', medianSentiment.toString(), '0')
-      contract.on('Minted', (to, tokenId) => {
-        toast("Success!", {
-          icon: '🎉',
-        });
-        setStep(4)
-      })
-      return () => {
-        contract.removeAllListeners();
-      }
+      // toast("Waiting for the transaction to finalize... soon", {
+      //   icon: '👀',
+      // });  
+      const tnx = await contract.safeMint('0', medianSentiment.toString(), '0')
+      toast.promise(
+        tnx.wait(),
+         {
+           loading: 'Waiting for transaction to finalize 👀',
+           success: <b>Success! 🎉</b>,
+           error: <b>Something did not go right 🤔</b>,
+         }
+       );      
+      // contract.on('Minted', (to, tokenId) => {
+      //   toast("Success!", {
+      //     icon: '🎉',
+      //   });
+      //   setLoading(false)
+      //   setStep(4)
+      // })
+      // return () => {
+      //   contract.removeAllListeners();
+      // }
     }
     catch(error) {
       console.log(error)
+      setLoading(false)
     }
   }
 
@@ -137,7 +153,17 @@ const Signup = ({variables}) => {
               <Header />
 
               <div className='flex px-5 w-full h-[calc(80%)] justify-center items-center'>
-        
+
+                {/* This component is for overshadoing with the loader  */}
+                <div className={loading ? "fixed top-[calc(0%)] left-[calc(0%)] opacity-50 w-screen h-screen z-10 bg-black" : "hidden"}>
+                  <div className="flex flex-col w-full h-full items-center justify-center">
+                    <div className="flex animate-spin w-1/12 h-1/12">
+                      <Spinner /> 
+                    </div>
+                  </div> 
+                </div>
+                {/* ends here */}
+
                 <div className='flex flex-col space-y-10 justify-center'>
                   
                   <div className="flex flex-col lg:flex-row lg:space-x-5 items-center">
@@ -242,4 +268,3 @@ export async function getStaticProps() {
 }
 
 export default Signup
-
