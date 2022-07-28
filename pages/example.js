@@ -1,40 +1,35 @@
 import Head from "next/head"
 import Header from "../components/Header"
 import { gql, useQuery } from '@apollo/client'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import predictSentiment from "../models/sentiment"
 import ReactMarkdown from 'react-markdown';
-import { abs } from "mathjs"
+import { abs, floor } from "mathjs"
 
 
 const Feed = () => {
   
   const [publications, setPublications] = useState([])
-  const [pageInfo, setPageInfo] = useState()
   const [myNumber, setMyNumber] = useState(0.898)
-
-  const { data, loading, error, fetchMore } = useQuery(EXPLORE_FEED_QUERY, {
-    variables: {
-      request: {
-        limit: 10,
-      },
-      reactionRequest: null,
-      profileId: null
-    },
-    async onCompleted(data) {
-      setPageInfo(data?.explorePublications?.pageInfo)
-      // setPublications(data?.explorePublications?.items)
-      let result = await predictSentiment(data?.explorePublications?.items)
-      result = result.map((item) => {
-        const newRes = abs(item.res.score - myNumber)
-        return {...item, newRes: newRes}
-      })
-      result.sort((a,b)=> (a.newRes > b.newRes ? 1 : -1))
-      setPublications(result.slice(0,20))
-      console.log(result.slice(0,20))
-    }
+  
+  const { data, loading, error, fetchMore, refetch } = useQuery(EXPLORE_FEED_QUERY, {
+      async onCompleted(data) {
+        let result = await predictSentiment(data?.explorePublications?.items)
+        result = result.map((item) => {
+          const newRes = abs(item.res.score - myNumber)
+          return {...item, newRes: newRes}
+        })
+        result.sort((a,b)=> (a.newRes > b.newRes ? 1 : -1))
+        setPublications(result.slice(0,20))
+        console.log(result.slice(0,20))
+      }
   })
+  
+  const updateData = () => {
+    setPublications([])
+    refetch() 
+  }
 
 
     return(
@@ -51,7 +46,17 @@ const Feed = () => {
             <div className='flex px-5 w-full min-h-[calc(80%)] justify-center items-start bg-inherit'>
 
               {/* Placeholder for left content */}
-              <div className="flex w-1/4">
+              <div className="flex w-1/4 justify-center px-10">
+                <div className="flex flex-col w-full h-52 items-center justify-around py-5 rounded-md bg-cf-cream">
+                    <h2 className="font-bold">Elmos&apos;s example feed</h2>
+                    
+                    <label htmlFor="default-range" className="block mb-2 text-sm mt-3 font-medium">What happens if you change this? 👀</label>
+                    <input onChange={(e) => {setMyNumber(e.target.value/100)}} id="default-range" type="range" defaultValue={myNumber*100} min={0} max={100} className="h-2 w-1/2 bg-cf-light-blue rounded-lg appearance-none cursor-pointer"></input>
+                    <p>{floor(myNumber*100)}</p> 
+                    <button onClick={updateData} className="bg-cf-red text-cf-cream font-semibold border border-black mt-10 p-2 w-1/2">
+                        Refresh
+                    </button>
+                </div>
               </div>
 
               <div className="flex flex-col w-1/2">

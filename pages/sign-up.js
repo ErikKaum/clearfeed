@@ -87,13 +87,14 @@ const Signup = ({variables}) => {
     });
 
     const tweets = await getLikedTweets()
-    const sentiments = await predictSentiment(tweets)
+    const isTwitter = true
+    const sentiments = await predictSentiment(tweets, isTwitter)
 
     const roundedSentiment = round(sentiments, 3)
-    // console.log(roundedSentiment)
+    console.log(roundedSentiment)
     const medianSentiment = median(roundedSentiment)
     
-    // console.log(medianSentiment)
+    console.log(medianSentiment)
 
     const signer = currentProvider.getSigner();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);

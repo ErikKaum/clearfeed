@@ -81,9 +81,9 @@ export default function Home() {
     // }
   }
 
-  const handleClick2 = async () => {
-    setOpened(true)      
-  }
+  // const handleClick2 = async () => {
+  //   setOpened(true)      
+  // }
 
   return (
     <div>
@@ -112,7 +112,7 @@ export default function Home() {
 
             <div className='flex flex-col space-y-10 justify-center items-center'>
               <h2 className='text-center text-4xl sm:text-6xl font-bold'>
-              Personalized content <br/>
+              Personalized feed 🏄‍♂️ <br/>
               while keeping your data private
               </h2>
 
@@ -124,10 +124,12 @@ export default function Home() {
                 </Link>
 
                 <p className='text-2xl font-bold'>or</p>
-
-                <button onClick={handleClick2}>
+                
+                <Link href={"/example"}>
+                <button>
                   <Image src={Btn2} alt="button" height={110*0.7} width={412*0.7} />
                 </button>
+                </Link>
               </div>
 
 
