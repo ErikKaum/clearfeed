@@ -112,7 +112,7 @@ export default function Home() {
 
             <div className='flex flex-col space-y-10 justify-center items-center'>
               <h2 className='text-center text-4xl sm:text-6xl font-bold'>
-              Personalized feed 🏄‍♂️ <br/>
+              Personalized feed<br/>
               while keeping your data private
               </h2>
 

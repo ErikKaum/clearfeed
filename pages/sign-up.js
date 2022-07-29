@@ -3,13 +3,13 @@ import Image from "next/image"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import Header from "../components/Header"
+import LogInModal from "../components/modal"
 
 import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider'
 import { CONTRACT_ADDRESS } from "../utils/address";
 import abi from "../utils/ClearFeed.json"
 
-import Spinner from "../assets/spinner"
 import Btn2 from "../assets/Button2.svg"
 import { TwitterApi } from 'twitter-api-v2';
 
@@ -22,6 +22,7 @@ const Signup = ({variables}) => {
     const [step, setStep] = useState(1);
     const [currentAccessToken, setAccessToken] = useState(null)
     const [currentProvider, setProvider] = useState(null)
+    const [modal, setModal] = useState(false)
     const router = useRouter()
 
     const clientId = variables.clientId
@@ -150,6 +151,7 @@ const Signup = ({variables}) => {
           <main>
             <div className="w-full h-screen bg-cf-light-blue">
               <Header />
+              <LogInModal modal={modal} setModal={setModal} setStep={setStep}/>
 
               <div className='flex px-5 w-full h-[calc(80%)] justify-center items-center'>
 
@@ -165,9 +167,9 @@ const Signup = ({variables}) => {
 
                 <div className='flex flex-col space-y-10 justify-center'>
                   
-                  <div className="flex flex-col lg:flex-row lg:space-x-5 items-center">
+                  {/* <div className="flex flex-col lg:flex-row lg:space-x-5 items-center">
                     <button
-                      className="border-2 border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
+                      className="border-2 border-black rounded-md w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
                       onClick={connectSoMe}
                       disabled={step === 1 ? false : true}
                       >
@@ -176,44 +178,44 @@ const Signup = ({variables}) => {
                     <p className={`${step === 1 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
                         1. Log in with your social media
                     </p>
-                  </div>
+                  </div> */}
 
                   <div className="flex flex-col lg:flex-row lg:space-x-5 items-center">
                     <button
-                      className="border-2 border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
-                      onClick={connectWallet}
-                      disabled={step === 2 ? false : true}
+                      className="border-2 rounded-md border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
+                      onClick={() => setModal(true)}
+                      disabled={step === 1 ? false : true}
                       >
-                        Connect
+                        Log in
                     </button>
-                    <p className={`${step === 2 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
-                        2. Connect your wallet
+                    <p className={`${step === 1 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
+                        1. Log in with Lens
                     </p>                  
                   </div> 
 
                   <div className="flex flex-col lg:flex-row lg:space-x-5 items-center">
                     <button
-                      className="border-2 border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
+                      className="border-2 rounded-md border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
                       onClick={mint}
-                      disabled={step === 3 ? false : true}
+                      disabled={step === 2 ? false : true}
                       >
                         Let&apos;s do this!
                     </button>
-                    <p className={`${step === 3 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
-                        3. Get your personalized feed!
+                    <p className={`${step === 2 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
+                        2. Get your personalized feed!
                     </p>
                   </div>
 
                   <div className="flex flex-col lg:flex-row lg:space-x-5 items-center">
                     <button
-                      className="border-2 border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
+                      className="border-2 rounded-md border-black w-48 h-14 bg-cf-red text-cf-cream text-xl font-semibold disabled:opacity-30"
                       onClick={() => {router.push('/feed')}}
-                      disabled={step === 4 ? false : true}
+                      disabled={step === 3 ? false : true}
                       >
                         Here!
                     </button>
-                    <p className={`${step === 4 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
-                        4. Enjoy your feed!
+                    <p className={`${step === 3 ? 'text-black' : 'text-gray-500'} text-2xl md:text-4xl font-bold`}>
+                        3. Enjoy your feed!
                     </p>
                   </div>
 

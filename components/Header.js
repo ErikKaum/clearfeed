@@ -11,7 +11,7 @@ const Header = () => {
 
         <div className='flex hover:cursor-pointer'>
           <Link href={"/"}>
-            <h1 className='font-bold text-4xl'>Clear Feed</h1>
+            <h1 className='font-bold text-4xl'>Clear Feed 🏄‍♂️</h1>
           </Link>
         </div>
 
