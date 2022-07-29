@@ -117,17 +117,18 @@ export default function Home() {
               </h2>
 
               <div className='flex flex-col mt-10 w-full h-full items-center justify-evenly space-y-5'>
-                <Link href={"/sign-up"}>
+                {/* <Link href={"/sign-up"}>
                   <button>
                     <Image src={Btn} alt="button" height={110*0.7} width={300*0.7} />
                   </button>
                 </Link>
 
-                <p className='text-2xl font-bold'>or</p>
+                <p className='text-2xl font-bold'>or</p> */}
                 
                 <Link href={"/example"}>
-                <button>
-                  <Image src={Btn2} alt="button" height={110*0.7} width={412*0.7} />
+                <button className='bg-cf-red font-bold text-3xl text-cf-cream rounded-md border-2 border-black py-5 px-10'>
+                  Try it out
+                  {/* <Image src={Btn2} alt="button" height={110*0.7} width={412*0.7} /> */}
                 </button>
                 </Link>
               </div>
