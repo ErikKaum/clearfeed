@@ -14,10 +14,16 @@ import Btn2 from "../assets/Button2.svg";
 import toast, { Toaster } from 'react-hot-toast';
 import Header from '../components/Header';
 
+import { useContext } from 'react';
+import { walletContext } from '../utils/context'
 
 export default function Home() {
 
   const [opened, setOpened] = useState(false);
+  const walletInfo = useContext(walletContext)
+
+  console.log(walletInfo)
+
 
   const handleClick = async() => {
     const ethereum = await detectEthereumProvider({mustBeMetaMask : true})
