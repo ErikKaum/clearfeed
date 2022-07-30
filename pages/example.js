@@ -48,7 +48,6 @@ const Feed = () => {
         <main>
           <div className="w-full h-screen bg-cf-light-blue">
             <FeedHeader setModal={setModal} />
-            <LogInModal modal={modal} setModal={setModal} />
                         
             <div className="flex h-32 w-full">
             </div>
