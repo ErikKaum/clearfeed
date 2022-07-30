@@ -9,7 +9,7 @@ import predictSentiment from "../models/sentiment"
 import ReactMarkdown from 'react-markdown';
 import { abs, floor } from "mathjs"
 import FeedHeader from "../components/FeedHeader"
-import LogInModal from "../components/modal"
+import LogInModal from "../components/Modal"
 
 import { EXPLORE_FEED_QUERY } from "../lensApi/queries"
 
@@ -74,9 +74,12 @@ const Feed = () => {
                 {publications && publications.map((post ) => {
                   return(
                     <div key={post.id} className="h-1/6 p-5 mb-5 bg-cf-cream rounded-md">
-
                       <p className="font-bold">{post.profile.handle}</p>
-                      <ReactMarkdown>{post.metadata.content}</ReactMarkdown>
+                      <ReactMarkdown className="mb-2">{post.metadata.content}</ReactMarkdown>
+                      <hr className="border"/>
+                      <a href={`https://lenster.xyz/posts/${post.id}`} rel="noopener noreferrer" target="_blank" >
+                        <p className="mt-5 text-sm">Read post on Lenster</p>
+                      </a>
                     </div>              
                   )
                 })}
