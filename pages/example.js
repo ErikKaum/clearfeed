@@ -9,7 +9,6 @@ import predictSentiment from "../models/sentiment"
 import ReactMarkdown from 'react-markdown';
 import { abs, floor } from "mathjs"
 import FeedHeader from "../components/FeedHeader"
-import LogInModal from "../components/Modal"
 
 import { EXPLORE_FEED_QUERY } from "../lensApi/queries"
 
