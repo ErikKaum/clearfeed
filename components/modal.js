@@ -1,100 +1,84 @@
 import Image from "next/image"
-import { useState } from "react"
+import { useContext } from "react"
 
 import metamask from '../assets/metamask.png'
 import walletconnect from '../assets/walletconnect.png'
-import lens from '../assets/lens.png'
 
-import { ApolloClient, InMemoryCache } from '@apollo/client'
-import { gql } from '@apollo/client'
+import { generateChallenge, authenticate, refreshAuth, getDefaultProfile } from '../lensApi/auth'
 
 import detectEthereumProvider from '@metamask/detect-provider'
 import { ethers } from "ethers"
 
+import { walletContext, LensTokenContext , lensProfileContext} from "../utils/context"
+
 import toast, { Toaster } from "react-hot-toast"
 
-const LogInModal = ({modal, setModal, setStep}) => {
+const LogInModal = ({modal, setModal, setStep = false}) => {
 
-  const apolloClient= new ApolloClient({
-    uri: 'https://api.lens.dev',
-    cache: new InMemoryCache(),
-  })
-      
+  const { account, setAccount, provider, setProvider } = useContext(walletContext)
+  const {accessToken, setAccessToken, refreshToken, setRefreshToken } = useContext(LensTokenContext)
+  const { profile, setProfile } = useContext(lensProfileContext)
 
-  const [currentProvider, setProvider] = useState(null)
-  const [currentAddress, setCurrentAddress] = useState()
-  const [logInLens, setLogInLens] = useState(false)
-  
   const connectWallet = async () => {
-    const ethereum = await detectEthereumProvider({mustBeMetaMask : true})
-    if (ethereum) {
-      const provider = new ethers.providers.Web3Provider(ethereum)
-      let accounts
-      try {
-        accounts = await provider.send("eth_requestAccounts", []);
-        setProvider(provider)
-        setCurrentAddress(accounts[0])
-        setLogInLens(true)
-        // setStep(3)
-      } catch(error) {
-        toast("Can't continue without connecting wallet", {
-          icon: '🤷',
-        });
-      }
+    if (!account) {
+      const ethereum = await detectEthereumProvider({mustBeMetaMask : true})
+      if (ethereum) {
+        const currentProvider = new ethers.providers.Web3Provider(ethereum)
+        let accounts
+        try {
+          accounts = await currentProvider.send("eth_requestAccounts", []);
+          setProvider(provider)
+          setAccount(accounts[0])
+          // setStep(3)
+        } catch(error) {
+          toast("Can't continue without connecting wallet", {
+            icon: '🤷',
+          });
+        }
+      }    
     }
-  }
-
-  const GET_CHALLENGE = `
-  query($request: ChallengeRequest!) {
-    challenge(request: $request) { text }
-  }`
-  const generateChallenge = (address) => {
-    return apolloClient.query({
-     query: gql(GET_CHALLENGE),
-     variables: {
-       request: {
-          address,
-       },
-     },
-   })
-  }
-
-  const AUTHENTICATION = `
-  mutation($request: SignedAuthChallenge!) { 
-    authenticate(request: $request) {
-      accessToken
-      refreshToken
-    }
-  }`
-
-  const authenticate = (address, signature) => {
-    return apolloClient.mutate({
-     mutation: gql(AUTHENTICATION),
-     variables: {
-       request: {
-         address,
-         signature,
-       },
-     },
-   })
   }
 
   const connectLens = async() => {
-    const challengeResponse = await generateChallenge(currentAddress);
-    const signer = currentProvider.getSigner();
-    const signature = await signer.signMessage(challengeResponse.data.challenge.text);
-    const accessTokens = await authenticate(currentAddress, signature);
-    console.log(accessTokens);
-    setModal(false)
-    setStep(2)
+    let tokens
+    if (refreshToken) {
+      tokens = await refreshAuth(refreshToken)
+      setAccessToken(tokens.data.refresh.accessToken)
+      setRefreshToken(tokens.data.refresh.refreshToken)
+      localStorage.setItem('accessToken', tokens.data.refresh.accessToken)
+      localStorage.setItem('refreshToken', tokens.data.refresh.refreshToken)
+  
+    } else {
+      const challengeResponse = await generateChallenge(account);
+      const signer = provider.getSigner();
+      const signature = await signer.signMessage(challengeResponse.data.challenge.text);
+      tokens = await authenticate(account, signature);
+      setAccessToken(tokens.data.authenticate.accessToken)
+      setRefreshToken(tokens.data.authenticate.refreshToken)
+      localStorage.setItem('accessToken', tokens.data.authenticate.accessToken)
+      localStorage.setItem('refreshToken', tokens.data.authenticate.refreshToken)
+    }
+    
+    const defaultProfile = await getDefaultProfile(account)
+    console.log(defaultProfile)
+    if (defaultProfile.data.defaultProfile === null) {
+      toast("No Lens profile found in this wallet", {
+        icon: '🤷',
+      });
+    } else {
+      setProfile(defaultProfile.data.defaultProfile)
+      localStorage.setItem('profile', JSON.stringify(defaultProfile.data.defaultProfile))
+      
+      setModal(false)
+      setStep(2)     
+    }
   }
-
 
   return(
       <div className={modal ? "fixed top-[calc(0%)] left-[calc(0%)] w-screen h-screen z-10" : "hidden"}>
       <div className="flex flex-col w-full h-full bg-cf-black-low-opa items-center justify-center">
         <div className="flex flex-col bg-cf-cream py-10 px-16 space-y-2 rounded-md">
-          {logInLens === false &&
+          {!account &&
           <>
             <button className="flex justify-start items-center" onClick={connectWallet}>
               <Image alt="metamask" src={metamask} width={1200*0.04} height={1200*0.04}></Image>
@@ -113,7 +97,7 @@ const LogInModal = ({modal, setModal, setStep}) => {
           </>
           }
           
-          {logInLens === true &&
+          {account &&
           <>
             <button className="flex justify-start items-center" onClick={connectLens}>
               {/* <Image alt="metamask" src={lens} width={199*0.2} height={253*0.2}></Image> */}

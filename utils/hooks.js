@@ -3,8 +3,8 @@ import { ethers } from "ethers"
 import detectEthereumProvider from '@metamask/detect-provider'
 
 export const useWalletData = () => {
-    const [account, setAccount] = useState(null)   
-    const [provider, setProvider] = useState(null)   
+    const [account, setAccount] = useState(undefined)   
+    const [provider, setProvider] = useState(undefined)   
 
     useEffect(() => {
         const checkConnection = async() => {
@@ -34,13 +34,54 @@ export const useWalletData = () => {
     return { walletValue }
 }
 
-// export const useAgentData = () => {
-//     const [agent, setAgent] = useState(null)
+export const useLensToken = () => {
+    const [accessToken, setAccessToken] = useState(undefined)
+    const [refreshToken, setRefreshToken] = useState(undefined)
 
-//     const agentValue = useMemo(
-//         () => ({ agent, setAgent }), 
-//         [agent]
-//     );
+    useEffect(() => {
+      try{
+        const currentAccessToken = localStorage.getItem('accessToken')
+        const currentrefreshToken = localStorage.getItem('refreshToken')
+        if (currentAccessToken !== 'null') {
+          setAccessToken(currentAccessToken)
+        }
+        if (currentrefreshToken !== 'null') {
+          setRefreshToken(currentrefreshToken)
+        }
+      } catch(error){
+        console.log(error)
+        setAccessToken(undefined)
+        setRefreshToken(undefined)
+      }
+    },[])
 
-//     return { agentValue }
-// }
+    const LensTokenValue = useMemo(
+        () => ({ accessToken, setAccessToken, refreshToken, setRefreshToken }), 
+        [accessToken, refreshToken]
+    );
+
+    return { LensTokenValue }
+}
+
+export const useLensProfile = () => {
+  const [profile, setProfile] = useState(undefined)
+
+  useEffect(() => {
+    try{
+      const currentProfile = localStorage.getItem('profile')
+      if (currentProfile !== 'null') {
+        setProfile(JSON.parse(currentProfile))
+      }
+    } catch(error){
+      console.log(error)
+      setProfile(undefined)
+    }
+  },[])
+
+  const lensProfileValue = useMemo(
+      () => ({ profile, setProfile }), 
+      [profile]
+  );
+
+  return { lensProfileValue }
+}

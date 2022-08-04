@@ -2,7 +2,7 @@
 
 import { loadLayersModel, tensor2d } from '@tensorflow/tfjs'
 
-const predictSentiment = async (textArray, isTwitter) => {
+const predictSentiment = async (textArray) => {
 
     const model = await loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/model.json');
     const metadataJson = await fetch('https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/metadata.json');
@@ -14,24 +14,14 @@ const predictSentiment = async (textArray, isTwitter) => {
     const maxLen = metadata['max_len']
 
     const results = []
-    if (isTwitter === true) {
-      textArray.forEach(element => {
-        const text = element.text
-        const res = predict(text,  wordIndexIn, vocabularySize, indexFrom, maxLen, model) 
-        console.log(text, res)
+    textArray.forEach(element => {
+      const text = element.metadata.content
+      const res = predict(text,  wordIndexIn, vocabularySize, indexFrom, maxLen, model) 
+      // console.log(text, res)
        
-        results.push(res.score)
-     });
-    }
-     else {
-      textArray.forEach(element => {
-        const text = element.metadata.content
-        const res = predict(text,  wordIndexIn, vocabularySize, indexFrom, maxLen, model) 
-        // console.log(text, res)
-       
-        results.push({...element, res: res})
+      results.push({...element, res: res})
      }); 
-     }
+     
     return results
 }
 

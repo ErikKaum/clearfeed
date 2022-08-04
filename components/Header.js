@@ -6,7 +6,7 @@ const Header = () => {
         <div className='flex w-full h-[calc(20%)] items-center justify-around'>
         
         {/* placeholder for top left content */}
-        <div>
+        <div className="flex w-60">
         </div>
 
         <div className='flex hover:cursor-pointer'>
@@ -16,7 +16,7 @@ const Header = () => {
         </div>
 
         {/* placeholder for top right content */}
-        <div>
+        <div className="flex space-x-5 w-60">
         </div>
 
       </div>

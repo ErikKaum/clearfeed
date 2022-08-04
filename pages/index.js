@@ -6,90 +6,33 @@ import { CONTRACT_ADDRESS } from "../utils/address";
 import abi from "../utils/ClearFeed.json"
 
 import Head from 'next/head'
-import Image from 'next/image'
 import Link from 'next/link';
-import Btn from "../assets/Button.svg";
-import Btn2 from "../assets/Button2.svg";
 
 import toast, { Toaster } from 'react-hot-toast';
 import Header from '../components/Header';
 
 import { useContext } from 'react';
-import { walletContext } from '../utils/context'
+import { walletContext, LensTokenContext, lensProfileContext } from '../utils/context'
 
 export default function Home() {
 
   const [opened, setOpened] = useState(false);
   const walletInfo = useContext(walletContext)
+  const tokenInfo = useContext(LensTokenContext)
+  const profileInfo = useContext(lensProfileContext)
 
   console.log(walletInfo)
+  console.log(tokenInfo)
+  console.log(profileInfo)
 
-
-  const handleClick = async() => {
-    const ethereum = await detectEthereumProvider({mustBeMetaMask : true})
-
-    if (ethereum) {
-      const provider = new ethers.providers.Web3Provider(ethereum)
-      let accounts 
-      try {
-        accounts = await provider.send("eth_requestAccounts", []);
-      } catch(error) {
-        toast("Can't continue without connecting wallet", {
-          icon: '🤷',
-        });
-        
-      }
-
-      if (accounts) {
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
-        try {
-          await contract.safeMint('zero','one','two') 
-        }
-        catch(error) {
-          console.log(error)
-        }
-      }
-    } else {  
-      console.log('here')
-    }
-    // try {
-    //   const { ethereum } = window
-    //   if (ethereum) {
-    //     const provider = new ethers.providers.Web3Provider(ethereum);
-        
-    //     let accounts 
-    //     try {
-    //       accounts = await provider.send("eth_requestAccounts", []);
-    //     } catch(error) {
-    //       toast("Can't continue without connecting wallet", {
-    //         icon: '🤷',
-    //       });
-          
-    //     }
-
-    //     if (accounts) {
-    //       const signer = provider.getSigner();
-    //       const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
-    //       try {
-    //         await contract.safeMint('zero','one','two') 
-    //       }
-    //       catch(error) {
-    //         console.log(error)
-    //       }
-    //     }
-    //   }
-    // } catch(error) {
-    //   toast('You need metamask to make this work!', {
-    //     icon: '🤷',
-    //   });
-      
-    // }
+  const soon = () => {
+    toast('Soon...', {
+      icon: '👀',
+    });
+    
   }
 
-  // const handleClick2 = async () => {
-  //   setOpened(true)      
-  // }
+
 
   return (
     <div>
@@ -104,7 +47,7 @@ export default function Home() {
         <div className="w-full h-screen bg-cf-light-blue">
           <Header />
 
-          <div className='flex px-5 w-full h-[calc(80%)] justify-center items-center'>
+          <div className='flex px-5 w-full h-[calc(70%)] justify-center items-center'>
             
             <div className={opened ? 'fixed top-[calc(40%)] left-[calc(30%)] right-[calc(30%)] z-10 bg-cf-cream border-2 border-black p-10' : 'hidden'}>
               <div className='flex divide-y w-full h-full flex-col items-center justify-center'>
@@ -123,18 +66,17 @@ export default function Home() {
               </h2>
 
               <div className='flex flex-col mt-10 w-full h-full items-center justify-evenly space-y-5'>
-                {/* <Link href={"/sign-up"}>
-                  <button>
-                    <Image src={Btn} alt="button" height={110*0.7} width={300*0.7} />
-                  </button>
-                </Link>
+                {/* <Link href={"/sign-up"}> */}
+                <button onClick={soon} className='bg-cf-red font-bold text-3xl text-cf-cream rounded-md border-2 border-black py-3 px-10'>
+                  I&apos;m in
+                </button>
+                {/* </Link> */}
 
-                <p className='text-2xl font-bold'>or</p> */}
+                <p className='text-2xl font-bold'>or</p>
                 
                 <Link href={"/example"}>
-                <button className='bg-cf-red font-bold text-3xl text-cf-cream rounded-md border-2 border-black py-5 px-10'>
-                  Try it out
-                  {/* <Image src={Btn2} alt="button" height={110*0.7} width={412*0.7} /> */}
+                <button className='bg-cf-red font-bold text-3xl text-cf-cream rounded-md border-2 border-black py-3 px-10'>
+                  See example
                 </button>
                 </Link>
               </div>
@@ -142,15 +84,13 @@ export default function Home() {
 
             </div>
           </div> 
-
-
+          {/* <hr className='border'/> */}
+          <footer className='flex w-full h-[calc(10%)] space-x-5 pr-10 justify-end items-center'>
+            <Link href={'/about'}>About</Link>
+            <a rel="noopener noreferrer" target="_blank" href={'https://twitter.com/clear_feed'}>Contact</a>
+          </footer>
         </div>
-
       </main>
-
-
-      <footer>
-      </footer>
     </div>
   )
 }

@@ -1,106 +1,51 @@
 import Head from "next/head"
-import Image from "next/image"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import Header from "../components/Header"
-import LogInModal from "../components/modal"
+import LogInModal from "../components/Modal"
 
-import { ethers } from 'ethers';
-import detectEthereumProvider from '@metamask/detect-provider'
+import { ethers  } from 'ethers';
 import { CONTRACT_ADDRESS } from "../utils/address";
-import abi from "../utils/ClearFeed.json"
-
-import Btn2 from "../assets/Button2.svg"
-import { TwitterApi } from 'twitter-api-v2';
+import abi from"../utils/ClearFeed.json"
 
 import predictSentiment from "../models/sentiment"
+import relations from "../models/relations"
 import { round, median } from "mathjs"
 import toast, { Toaster } from "react-hot-toast"
 
-const Signup = ({variables}) => {
+import { getPublications } from "../lensApi/queries"
+import { lensProfileContext, walletContext } from "../utils/context"
 
-    const [step, setStep] = useState(1);
-    const [currentAccessToken, setAccessToken] = useState(null)
-    const [currentProvider, setProvider] = useState(null)
-    const [modal, setModal] = useState(false)
-    const router = useRouter()
+const Signup = () => {
 
-    const clientId = variables.clientId
-    const clientSecret = variables.clientSecret
-    const callbackURL = variables.callbackURL
-
-    const twitterClient = new TwitterApi({
-      clientId: clientId,
-      clientSecret: clientSecret,
-    });
-
-    useEffect(() => {
-      const accessToken = localStorage.getItem('accessToken')
-      if (accessToken) {
-        setStep(2);
-      }
-    },[])
-
-    useEffect(() => {
-        const logging = async () => {
-            if (router.query.state) {
-                const codeVerifier = localStorage.getItem('codeVerifier')
-                const res = await fetch('api/callback?' + new URLSearchParams({
-                    state: router.query.state,
-                    code: router.query.code,
-                    codeVerifier : codeVerifier
-                }))
-                const currentAccesToken = await res.json()
-                setAccessToken(currentAccesToken.accessToken)
-                localStorage.setItem('accessToken', currentAccesToken.accessToken)
-                setStep(2)
-            }    
-        }
-        logging()
-    },[router])
-    
-    const connectSoMe = async() => {
-        const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(callbackURL, { scope: ['like.read', 'tweet.read', 'users.read',] });
-        localStorage.setItem('codeVerifier', codeVerifier)
-        router.push(url)
-    }
-
-    const connectWallet = async () => {
-      const ethereum = await detectEthereumProvider({mustBeMetaMask : true})
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum)
-        let accounts 
-        try {
-          accounts = await provider.send("eth_requestAccounts", []);
-          setProvider(provider)
-          setStep(3)
-        } catch(error) {
-          toast("Can't continue without connecting wallet", {
-            icon: '🤷',
-          });
-        }
-    }
-  }
+  const [step, setStep] = useState(1);
+  const [modal, setModal] = useState(false)
+  const router = useRouter()
+  const { profile, setProfile } = useContext(lensProfileContext)
+  const { account, setAccount, provider, setProvider } = useContext(walletContext)
 
   const mint = async () => {
     toast("Just a moment, preparing", {
       icon: '⏳',
     });
+    const relationList = await relations(account)
+    const relationsData = {data: relationList}
 
-    const tweets = await getLikedTweets()
-    const isTwitter = true
-    const sentiments = await predictSentiment(tweets, isTwitter)
+    console.log(relationsData)
 
+    const publications = await getPublications(profile.id)
+    const res = await predictSentiment(publications.data.publications.items)
+    const sentiments = res.map((item) => item.res.score)
     const roundedSentiment = round(sentiments, 3)
     console.log(roundedSentiment)
     const medianSentiment = median(roundedSentiment)
     
     console.log(medianSentiment)
 
-    const signer = currentProvider.getSigner();
+    const signer = provider.getSigner();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
     try {
-      await contract.safeMint('0', medianSentiment.toString(), '0')
+      await contract.safeMint('0', medianSentiment.toString(), JSON.stringify(relationsData))
       
       toast.promise(
         new Promise((res, rej) => {
@@ -129,15 +74,6 @@ const Signup = ({variables}) => {
     }
   }
 
-  const getLikedTweets = async () => {
-    const accessToken = localStorage.getItem('accessToken')
-    const res = await fetch('api/get-tweets?' + new URLSearchParams({
-      accessToken: accessToken,
-    }))
-    const data = await res.json()
-    const tweets = data.likedTweets._realData.data
-    return tweets
-  }
 
     return(
         <div>
@@ -240,32 +176,6 @@ const Signup = ({variables}) => {
         </div>
     )
   
-}
-
-export async function getStaticProps() {
-
-  let callbackURL
-  if (process.env.NODE_ENV === 'development') {
-    callbackURL = process.env.TWITTER_CALLBACK_URL_LOCAL
-  } else {
-    if (process.env.TWITTER_CALLBACK_URL_DEV) {
-      callbackURL = process.env.TWITTER_CALLBACK_URL_DEV
-    } else {
-      callbackURL = process.env.TWITTER_CALLBACK_URL_PROD
-    }
-  }
-  
-
-  const variables = ({
-    clientId: process.env.TWITTER_CLIENT_ID,
-    clientSecret : process.env.TWITTER_CLIENT_SECRET,
-    callbackURL : callbackURL
-  })
-  return {
-    props: {
-      variables
-    }
-  }
 }
 
 export default Signup
