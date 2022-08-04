@@ -49,11 +49,21 @@ const Feed = () => {
       data = data[1]
       let res = window.atob(data)
       res = res.slice(120,res.length-3)
+      console.log(JSON.parse(res))
       
       setRelations(JSON.parse(res))
     }
+
+    const getData = async() => {
+      const res = await (await fetch('/api/hello')).json()
+      setRelations(res)
+    }
+
     if (provider) {
       getNFT()
+    }
+    else {
+      getData()
     }
   },[provider])
 
@@ -219,7 +229,7 @@ const Feed = () => {
                     </form>
 
                     <form className="flex flex-col w-full items-center">
-                    <p className="text-sm font-medium mt-10">Turn ClearFeed on/off algorithm</p>
+                    <p className="text-sm font-medium mt-10">Turn ClearFeed algorithm on/off</p>
                     <div className="flex space-x-2 mt-3 items-center" onChange={(e) => setClearFeed(e.target.value)}>
                       <label className="text-sm font-medium" htmlFor="include">on</label><br/>
                       <input type='radio' name="second"  value={1}></input>
