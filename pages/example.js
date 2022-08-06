@@ -55,16 +55,19 @@ const Feed = () => {
     }
 
     const getData = async() => {
+      console.log('here')
       const res = await (await fetch('/api/hello')).json()
+      console.log(res)
       setRelations(res)
     }
 
-    if (provider) {
-      getNFT()
-    }
-    else {
-      getData()
-    }
+    // if (provider) {
+    //   getNFT()
+    // }
+    // else {
+    // }
+    
+    getData()
   },[provider])
 
   const defaultExplore = async () => {
@@ -90,7 +93,8 @@ const Feed = () => {
  
   }
 
-  const clearFeedWithSentiment = async() => { 
+  const clearFeedWithSentiment = async() => {
+    console.log(relations) 
     const relationsArray = relations.data
     const tempPosts = []
 
