@@ -39,6 +39,13 @@ module.exports = {
     mumbai: {
       url: process.env.MUMBAI_URL,
       accounts: [process.env.MUMBAI_ACCOUNT]
+    },
+    polygon: {
+      url: process.env.MAIN_URL,
+      accounts: [process.env.MAIN_ACCOUNT]
     }
+  },
+  etherscan: {
+    apiKey: process.env.POLY_SCAN_KEY
   },
 };
