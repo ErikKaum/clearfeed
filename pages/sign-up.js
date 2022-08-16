@@ -59,7 +59,7 @@ const Signup = () => {
           }
         })
         .then(() => {
-          setStep(4)
+          setStep(3)
         })
         .catch((error) => console.log(error)),
           {

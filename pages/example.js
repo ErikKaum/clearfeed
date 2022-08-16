@@ -205,11 +205,10 @@ const Feed = () => {
                     </p>
                     
                     <Link href={'/sign-up'}>
-                        <button disabled className="bg-cf-red disabled:opacity-50 text-cf-cream rounded-md font-semibold border border-black mt-10 p-2 w-1/2">
+                        <button className="bg-cf-red disabled:opacity-50 text-cf-cream rounded-md font-semibold border border-black mt-10 p-2 w-1/2">
                             I&apos;m in!
                         </button>
                     </Link>
-                    <p>Coming soon!</p>
                 </div>
 
                 <div className="flex flex-col w-full items-center justify-around py-5 rounded-md bg-cf-cream">
