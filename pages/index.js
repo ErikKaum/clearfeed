@@ -25,14 +25,6 @@ export default function Home() {
   console.log(tokenInfo)
   console.log(profileInfo)
 
-  const soon = () => {
-    toast('Soon...', {
-      icon: '👀',
-    });
-    
-  }
-
-
 
   return (
     <div>
@@ -66,11 +58,11 @@ export default function Home() {
               </h2>
 
               <div className='flex flex-col mt-10 w-full h-full items-center justify-evenly space-y-5'>
-                {/* <Link href={"/sign-up"}> */}
-                <button onClick={soon} className='bg-cf-red font-bold text-3xl text-cf-cream rounded-md border-2 border-black py-3 px-10'>
+                <Link href={"/sign-up"}>
+                <button className='bg-cf-red font-bold text-3xl text-cf-cream rounded-md border-2 border-black py-3 px-10'>
                   I&apos;m in
                 </button>
-                {/* </Link> */}
+                </Link>
 
                 <p className='text-2xl font-bold'>or</p>
                 
@@ -86,6 +78,7 @@ export default function Home() {
           </div> 
           {/* <hr className='border'/> */}
           <footer className='flex w-full h-[calc(10%)] space-x-5 pr-10 justify-end items-center'>
+            <Link href={"/feed"}> Feed</Link>
             <Link href={'/about'}>About</Link>
             <a rel="noopener noreferrer" target="_blank" href={'https://twitter.com/clear_feed'}>Contact</a>
           </footer>
