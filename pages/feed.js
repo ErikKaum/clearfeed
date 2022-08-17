@@ -132,6 +132,7 @@ const Feed = () => {
       await defaultExploreWithSentiment()
     }
     else {
+      console.log('here')
       await clearFeedWithSentiment()
     }
   }
@@ -244,12 +245,12 @@ const Feed = () => {
                   </form>
                   
                   <form className="flex flex-col w-full items-center">
-                  <p className="text-sm font-medium mt-10">See posts from 2nd order follows</p>
+                  <p className="text-sm font-medium mt-10">Keep this on for fun!</p>
                   <div className="flex space-x-2 mt-3 items-center" onChange={(e) => setSecond(e.target.value)}>
-                    <label className="text-sm font-medium" htmlFor="include">Include 2nd</label><br/>
+                    <label className="text-sm font-medium" htmlFor="include">Fun</label><br/>
                     <input type='radio' name="second" value={1}></input>
 
-                    <label className="text-sm font-medium" htmlFor="include">Exclude 2nd</label><br/>
+                    <label className="text-sm font-medium" htmlFor="include">Wild</label><br/>
                     <input type='radio' name="second" defaultChecked value={0}></input>
                   </div>
                   </form>
@@ -258,7 +259,7 @@ const Feed = () => {
                   <p className="text-sm font-medium mt-10">Turn ClearFeed algorithm on/off</p>
                   <div className="flex space-x-2 mt-3 items-center" onChange={(e) => setClearFeed(e.target.value)}>
                     <label className="text-sm font-medium" htmlFor="include">on</label><br/>
-                    <input type='radio' name="second"  value={1}></input>
+                    <input type='radio' name="second" value={1}></input>
 
                     <label className="text-sm font-medium" htmlFor="include">off</label><br/>
                     <input type='radio' name="second" defaultChecked value={0}></input>
