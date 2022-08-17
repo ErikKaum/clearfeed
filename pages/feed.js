@@ -49,17 +49,16 @@ const Feed = () => {
       data = data[1]
 
       let res = window.atob(data)
-      let res1 = window.atob(data)
+      let position = res.search("data")
 
-      res = res.slice(120, res.length-3)
-      res1 = res1.slice(121, res1.length-3)
+      res = res.slice(position-2, res.length-3)
+      console.log(res)
       
       try{
         console.log(JSON.parse(res))
         setRelations(JSON.parse(res))
       } catch {
-        console.log(JSON.parse(res1))
-        setRelations(JSON.parse(res1))
+        console.log('cannot parse tokenURI')
       }
 
     }
