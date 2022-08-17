@@ -29,8 +29,8 @@ const FeedHeaderSign = ({ setModal }) => {
 
 
       {/* placeholder for top right content */}
-      <div className="flex w-32 justify-center">
-        <button onClick={() => setModal(true)} className="rounded-md font-semibold bg-cf-cream py-2 w-full">
+      <div className="flex min-w-32 justify-center">
+        <button onClick={() => setModal(true)} className="rounded-md font-semibold bg-cf-cream py-2 px-5 w-full">
           <Text />
         </button>
       </div>
