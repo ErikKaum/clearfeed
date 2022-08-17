@@ -99,9 +99,10 @@ const LogInModal = ({modal, setModal, setStep = false}) => {
           
           {account &&
           <>
-            <button className="flex justify-start items-center" onClick={connectLens}>
+            <button className="text-xl font-semibold py-2 px-5 flex justify-start items-center bg-cf-red rounded-md border-2 border-black" onClick={connectLens}>
               {/* <Image alt="metamask" src={lens} width={199*0.2} height={253*0.2}></Image> */}
-              <p className="font-medium text-2xl">Log in with Lens</p>
+              {/* <p className="font-medium text-2xl p-2">Log in with Lens</p> */}
+              Log in with Lens
             </button>
             <div className="flex justify-end items-center">
               <button onClick={() => setModal(false)}>

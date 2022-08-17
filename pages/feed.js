@@ -70,7 +70,7 @@ const Feed = () => {
   
   useEffect(() => {
     const updateData = async() => {
-        await defaultExplore()
+      await defaultExplore()
     }
     updateData()
   },[])
@@ -131,7 +131,6 @@ const Feed = () => {
       await defaultExploreWithSentiment()
     }
     else {
-      console.log('here')
       await clearFeedWithSentiment()
     }
   }
