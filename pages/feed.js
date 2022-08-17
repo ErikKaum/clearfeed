@@ -47,11 +47,21 @@ const Feed = () => {
       let data = await contract.tokenURI(tokenId)
       data = data.split(",")
       data = data[1]
+
       let res = window.atob(data)
-      res = res.slice(120,res.length-3)
-      console.log(JSON.parse(res))
+      let res1 = window.atob(data)
+
+      res = res.slice(120, res.length-3)
+      res1 = res1.slice(121, res1.length-3)
       
-      setRelations(JSON.parse(res))
+      try{
+        console.log(JSON.parse(res))
+        setRelations(JSON.parse(res))
+      } catch {
+        console.log(JSON.parse(res1))
+        setRelations(JSON.parse(res1))
+      }
+
     }
     if (provider) {
       getNFT()
