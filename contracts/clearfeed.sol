@@ -8,8 +8,13 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
+import { Verifier } from "./verifier.sol";
+
+
 contract ClearFeed is ERC721, ERC721URIStorage, ERC721Enumerable {
-   
+    
+    Verifier private verifier;
+
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
@@ -17,23 +22,30 @@ contract ClearFeed is ERC721, ERC721URIStorage, ERC721Enumerable {
         string beta_zero;
         string beta_one;
         string beta_two;
+
+        string regression_beta_zero;
+        string regression_beta_one;
     }
     mapping(uint256 => Parameters) public paramsByIndex;
 
     event Minted (address owner, uint256 tokenId);
 
-    constructor () ERC721("Clear Feed", "CLF") {
+    constructor () ERC721("Clear Feed 2", "CLF") {
         _tokenIdCounter.increment();
+        verifier = new Verifier();
     }
 
     function safeMint(string memory zero, string memory one, string memory two) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         
-        Parameters storage paramters = paramsByIndex[tokenId];
-        paramters.beta_zero = zero;
-        paramters.beta_one = one;
-        paramters.beta_two = two;
+        Parameters storage parameters = paramsByIndex[tokenId];
+        parameters.beta_zero = zero;
+        parameters.beta_one = one;
+        parameters.beta_two = two;
+
+        parameters.regression_beta_zero = "0";
+        parameters.regression_beta_one = "0"; 
 
         _safeMint(msg.sender, tokenId);
         emit Minted(msg.sender, tokenId);
@@ -61,6 +73,18 @@ contract ClearFeed is ERC721, ERC721URIStorage, ERC721Enumerable {
                 Base64.encode(dataURI)
             )
         );
+    }
+
+    function enhance(uint256 tokenId, uint[8] memory proof, uint[4] memory input, string memory beta_zero, string memory beta_one) public {
+        uint[2] memory a = [proof[0], proof[1]];
+        uint[2][2] memory b = [[proof[2], proof[3]], [proof[4], proof[5]]];
+        uint[2] memory c = [proof[6], proof[7]];
+        
+        require(verifier.verifyProof(a, b, c, input), "invalid proof");
+
+        paramsByIndex[tokenId].regression_beta_zero = beta_zero;
+        paramsByIndex[tokenId].regression_beta_one = beta_one;
+
     }
 
     // Required by solidity to override

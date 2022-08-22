@@ -19,7 +19,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.3.0",
-    "react-markdown": "^8.0.3"
+    "react-markdown": "^8.0.3",
+    "snarkjs": "^0.4.19"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",

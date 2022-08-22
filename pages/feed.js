@@ -269,6 +269,13 @@ const Feed = () => {
                       Refresh
                   </button>
 
+                  <Link href={'/enhance'}>
+                    <button className="bg-cf-red text-cf-cream rounded-md font-semibold border border-black mt-10 p-2 w-1/2">
+                      Enhance
+                    </button>
+                  </Link>
+
+
               </div>
             </div>                
           </div>
